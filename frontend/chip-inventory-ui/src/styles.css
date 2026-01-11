@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f3f4f6;
+}
+
+.app {
+  display: flex;
+}
+
+.sidebar {
+  width: 220px;
+  background: #111827;
+  color: white;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  background: #1f2937;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  padding: 30px;
+}
+
+.header h1 {
+  margin-bottom: 0;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.card input, .card button {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+.card.wide {
+  max-width: 900px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+th {
+  background: #f9fafb;
+}
+
+.audit-list {
+  margin-top: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+.audit-list li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.muted {
+  font-size: 12px;
+  color: #666;
+}
