@@ -3,27 +3,25 @@ import api from "../api/api";
 
 export default function Inventory() {
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .get("/inventory")
-      .then((res) => setRows(res.data))
-      .catch(() => alert("Failed to load inventory"))
-      .finally(() => setLoading(false));
+    api.get("/inventory")
+      .then(res => {
+        console.log("Inventory API response:", res.data);
+        setRows(res.data);
+      })
+      .catch(err => alert("Inventory fetch failed"));
   }, []);
 
   return (
     <div className="card wide">
       <h2>Inventory Status</h2>
 
-      {loading && <p>Loading inventory...</p>}
-
-      {!loading && rows.length === 0 && (
+      {rows.length === 0 && (
         <p className="muted">No inventory records found.</p>
       )}
 
-      {!loading && rows.length > 0 && (
+      {rows.length > 0 && (
         <table>
           <thead>
             <tr>

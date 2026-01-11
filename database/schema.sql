@@ -22,7 +22,6 @@ CREATE TABLE components (
 CREATE TABLE lots (
     lot_id VARCHAR(50) PRIMARY KEY,
     component_id INT NOT NULL,
-    quantity INT NOT NULL,
     receipt_date DATE NOT NULL,
     current_status VARCHAR(50),
     FOREIGN KEY (component_id) REFERENCES components(component_id)
@@ -72,3 +71,24 @@ CREATE TABLE audit_logs (
     remarks TEXT,
     FOREIGN KEY (performed_by) REFERENCES users(user_id)
 );
+
+
+-- Resetting DATABASE
+-- DROP DATABASE IF EXISTS chip_inventory;
+-- CREATE DATABASE chip_inventory;
+-- SOURCE C:/Users/DELL/Desktop/sarangi/brahm/vscode/College_Projects/chip-inventory-tracking-system/database/schema.sql;
+-- SHOW TABLES;
+
+-- Some data to be populated by DEFAULT
+
+-- INSERT INTO users (name, email, password_hash, role) VALUES
+-- ('Admin User', 'admin@chip.com', '$2b$10$dummyadminhash', 'ADMIN'),
+-- ('Operations User', 'operator@chip.com', '$2b$10$dummyoperatorhash', 'OPERATOR'),
+-- ('Audit User', 'auditor@chip.com', '$2b$10$dummyauditorhash', 'AUDITOR');
+
+-- INSERT INTO locations (location_name, location_type) VALUES
+-- ('Fab-1', 'FAB'),
+-- ('Assembly-1', 'ASSEMBLY'),
+-- ('Warehouse-1', 'STORAGE'),
+-- ('Storage-2', 'STORAGE'),
+-- ('Storage-3', 'STORAGE');

@@ -1,79 +1,95 @@
-const db = require('../db');
+const db = require("../db");
 
-/* Request a transfer */
-exports.requestTransfer = (req, res) => {
+/* Create transfer request */
+exports.createTransfer = (req, res) => {
   const { lot_id, from_location_id, to_location_id, requested_by } = req.body;
 
   const sql = `
-    INSERT INTO transfers 
-    (lot_id, from_location_id, to_location_id, requested_by, status)
-    VALUES (?, ?, ?, ?, 'PENDING')
+    INSERT INTO transfers (lot_id, from_location_id, to_location_id, requested_by)
+    VALUES (?, ?, ?, ?)
   `;
 
-  db.query(sql, [lot_id, from_location_id, to_location_id, requested_by], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+  db.query(
+    sql,
+    [lot_id, from_location_id, to_location_id, requested_by],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: err.message });
 
-    const auditSql = `
-      INSERT INTO audit_logs (lot_id, action, performed_by, remarks)
-      VALUES (?, 'TRANSFER_REQUESTED', ?, 'Transfer request created')
-    `;
-    db.query(auditSql, [lot_id, requested_by]);
+      const auditSql = `
+        INSERT INTO audit_logs (lot_id, action, performed_by, remarks)
+        VALUES (?, 'TRANSFER_REQUESTED', ?, 'Transfer requested')
+      `;
 
-    res.status(201).json({
-      message: 'Transfer request submitted',
-      transfer_id: result.insertId
-    });
-  });
+      db.query(auditSql, [lot_id, requested_by]);
+
+      res.json({ message: "Transfer request created" });
+    }
+  );
 };
 
-/* Approve a transfer */
+/* Approve transfer */
 exports.approveTransfer = (req, res) => {
-  const { transferId } = req.params;
+  const transferId = req.params.id;
   const { approved_by } = req.body;
 
-  const fetchSql = `
-    SELECT * FROM transfers WHERE transfer_id = ? AND status = 'PENDING'
+  const getSql = `
+    SELECT lot_id, to_location_id
+    FROM transfers
+    WHERE transfer_id = ?
   `;
 
-  db.query(fetchSql, [transferId], (err, results) => {
-    if (err || results.length === 0) {
-      return res.status(404).json({ error: 'Transfer not found or already processed' });
-    }
+  db.query(getSql, [transferId], (err, rows) => {
+    if (err || rows.length === 0)
+      return res.status(404).json({ error: "Transfer not found" });
 
-    const transfer = results[0];
+    const { lot_id, to_location_id } = rows[0];
 
     const updateTransferSql = `
       UPDATE transfers
-      SET status = 'APPROVED', approved_by = ?, transfer_date = NOW()
+      SET status = 'APPROVED',
+          approved_by = ?,
+          transfer_date = NOW()
       WHERE transfer_id = ?
     `;
 
-    db.query(updateTransferSql, [approved_by, transferId], err2 => {
-      if (err2) return res.status(500).json({ error: err2.message });
+    db.query(updateTransferSql, [approved_by, transferId], (err) => {
+      if (err) return res.status(500).json({ error: err.message });
 
-      /* Update inventory */
-      const deductSql = `
-        UPDATE inventory
-        SET quantity_available = quantity_available
-        WHERE lot_id = ? AND location_id = ?
-      `;
-
-      const moveSql = `
+      const updateInventorySql = `
         UPDATE inventory
         SET location_id = ?
         WHERE lot_id = ?
       `;
 
-      db.query(deductSql, [transfer.lot_id, transfer.from_location_id]);
-      db.query(moveSql, [transfer.to_location_id, transfer.lot_id]);
+      db.query(updateInventorySql, [to_location_id, lot_id], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
 
-      const auditSql = `
-        INSERT INTO audit_logs (lot_id, action, performed_by, remarks)
-        VALUES (?, 'TRANSFER_APPROVED', ?, 'Transfer approved and executed')
-      `;
-      db.query(auditSql, [transfer.lot_id, approved_by]);
+        const auditSql = `
+          INSERT INTO audit_logs (lot_id, action, performed_by, remarks)
+          VALUES (?, 'TRANSFER_APPROVED', ?, 'Transfer approved')
+        `;
 
-      res.json({ message: 'Transfer approved successfully' });
+        db.query(auditSql, [lot_id, approved_by]);
+
+        res.json({ message: "Transfer approved" });
+      });
     });
+  });
+};
+
+/* Fetch audit logs by lot */
+exports.getAuditLogs = (req, res) => {
+  const { lot_id } = req.params;
+
+  const sql = `
+    SELECT action, performed_by, timestamp, remarks
+    FROM audit_logs
+    WHERE lot_id = ?
+    ORDER BY timestamp ASC
+  `;
+
+  db.query(sql, [lot_id], (err, rows) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(rows);
   });
 };

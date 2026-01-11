@@ -1,31 +1,38 @@
 const db = require('../db');
 
+/* Add lot + inventory */
 exports.addLot = (req, res) => {
-  const { lot_id, component_id, quantity, receipt_date, location_id } = req.body;
+  const { lot_id, component_id, quantity, location_id, receipt_date } = req.body;
 
   const lotSql = `
-    INSERT INTO lots (lot_id, component_id, quantity, receipt_date, current_status)
-    VALUES (?, ?, ?, ?, 'AVAILABLE')
+    INSERT INTO lots (lot_id, component_id, receipt_date)
+    VALUES (?, ?, ?)
   `;
 
-  db.query(lotSql, [lot_id, component_id, quantity, receipt_date], err => {
+  db.query(lotSql, [lot_id, component_id, receipt_date], (err) => {
     if (err) return res.status(500).json({ error: err.message });
 
-    const inventorySql = `
-      INSERT INTO inventory (lot_id, location_id, quantity_available)
+    const invSql = `
+      INSERT INTO inventory (lot_id, quantity_available, location_id)
       VALUES (?, ?, ?)
     `;
 
-    db.query(inventorySql, [lot_id, location_id, quantity], err2 => {
+    db.query(invSql, [lot_id, quantity, location_id], (err2) => {
       if (err2) return res.status(500).json({ error: err2.message });
-      res.status(201).json({ message: 'Lot and inventory created' });
+
+      res.json({ message: "Lot and inventory added" });
     });
   });
 };
 
+/* Get inventory */
 exports.getInventory = (req, res) => {
   const sql = `
-    SELECT l.lot_id, c.component_type, i.quantity_available, loc.location_name
+    SELECT
+      l.lot_id,
+      c.component_type,
+      i.quantity_available,
+      loc.location_name
     FROM inventory i
     JOIN lots l ON i.lot_id = l.lot_id
     JOIN components c ON l.component_id = c.component_id

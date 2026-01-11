@@ -1,27 +1,53 @@
-import { useState } from 'react';
-import api from '../api/api';
+import { useState } from "react";
+import api from "../api/api";
 
 export default function AddComponent() {
-  const [data, setData] = useState({
-    component_type: '',
-    supplier: '',
-    description: '',
+  const [form, setForm] = useState({
+    component_type: "",
+    supplier: "",
+    description: "",
   });
 
   const submit = async () => {
-    const res = await api.post('/components', data);
-    alert(JSON.stringify(res.data, null, 2));
+    const res = await api.post("/components", form);
+    alert("Component added successfully");
+
+    // RESET FORM
+    setForm({
+      component_type: "",
+      supplier: "",
+      description: "",
+    });
   };
 
   return (
     <div className="card">
       <h2>Add Component</h2>
-      <input placeholder="Component Type"
-        onChange={e => setData({ ...data, component_type: e.target.value })} />
-      <input placeholder="Supplier"
-        onChange={e => setData({ ...data, supplier: e.target.value })} />
-      <input placeholder="Description"
-        onChange={e => setData({ ...data, description: e.target.value })} />
+
+      <input
+        placeholder="Component Type"
+        value={form.component_type}
+        onChange={(e) =>
+          setForm({ ...form, component_type: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Supplier"
+        value={form.supplier}
+        onChange={(e) =>
+          setForm({ ...form, supplier: e.target.value })
+        }
+      />
+
+      <input
+        placeholder="Description"
+        value={form.description}
+        onChange={(e) =>
+          setForm({ ...form, description: e.target.value })
+        }
+      />
+
       <button onClick={submit}>Submit</button>
     </div>
   );

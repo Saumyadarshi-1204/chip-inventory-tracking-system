@@ -4,7 +4,6 @@ require('dotenv').config();
 
 const componentRoutes = require('./routes/componentRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
-const lotRoutes = require('./routes/lotRoutes');
 const transferRoutes = require('./routes/transferRoutes');
 
 const app = express();
@@ -17,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 /* ---------- Routes ---------- */
 app.use('/api/components', componentRoutes);
 app.use('/api/inventory', inventoryRoutes);
-app.use('/api/lots', lotRoutes);
+app.use('/api/transfers', transferRoutes);
 
 /* ---------- Health Check ---------- */
 app.get('/', (req, res) => {
@@ -29,6 +28,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
-
-/* ---------- Others ---------- */
-app.use('/api/transfers', transferRoutes);
