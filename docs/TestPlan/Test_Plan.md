@@ -37,11 +37,11 @@ This test plan defines the testing strategy, scope, resources, and schedule for 
 
 | Item | Details |
 |----|----|
-| OS | Windows 10 |
+| OS | Windows 11 |
 | Backend | Node.js + Express |
 | Database | MySQL |
 | Frontend | React (Vite) |
-| Browser | Chrome |
+| Browser | Microsoft Edge |
 
 ---
 
