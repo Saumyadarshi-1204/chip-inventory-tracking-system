@@ -5,6 +5,7 @@ require('dotenv').config();
 const componentRoutes = require('./routes/componentRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const lotRoutes = require('./routes/lotRoutes');
+const transferRoutes = require('./routes/transferRoutes');
 
 const app = express();
 
@@ -28,3 +29,6 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
+
+/* ---------- Others ---------- */
+app.use('/api/transfers', transferRoutes);
